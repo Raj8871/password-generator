@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <h1>Password Generator</h1>
+    </header>
+
+    <!-- Main Content Section -->
+    <div class="container">
+        <label for="username">Enter Your Name:</label>
+        <input type="text" id="username" placeholder="Enter your name" />
+
+        <div class="controls">
+            <label><input type="checkbox" id="useSymbols"> Include Symbols</label>
+            <label><input type="checkbox" id="useNumbers"> Include Numbers</label>
+            <label><input type="checkbox" id="useLowercase"> Include Lowercase Letters</label>
+            <label><input type="checkbox" id="useUppercase"> Include Uppercase Letters</label>
+        </div>
+
+        <button id="generate-btn">Generate Password</button>
+
+        <h3>Your Generated Password:</h3>
+        <input type="text" id="generated-password" readonly />
+
+        <h4 id="strengthIndicator"></h4>
+
+        <div class="copy">
+            <button id="copy-btn" style="display: none;">Copy Password</button>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2024 Password Generator - Designed by Rajan</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+<style>
+/* Global Styles */
+body {
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    background-color: #2c3e50;
+    color: white;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header Styles */
+header {
+    width: 100%;
+  height:60px;
+    background-color: #34495e;
+    padding: 10px;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+/* Main Content Section */
+.container {
+
+    font-size: 1em;
+    margin-top: 80px;
+    flex-grow: 1;
+    overflow-y: auto;
+    text-align: center;
+    background-color: #34495e;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgb(0,0,0.5);
+    max-width: 400px;
+    margin-bottom: 60px;
+  }
+
+/* Form Elements */
+input[type="text"], button {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    margin: 10px 0;
+    background-color: #ecf0f1;
+    border: none;
+    border-radius: 5px;
+    color: #2c3e50;
+}
+
+/* Checkbox Controls */
+.controls label {
+    display: block;
+    margin: 5px 0;
+}
+
+/* Generate Button */
+button {
+    background-color: #16a085;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #1abc9c;
+}
+
+.copy button {
+    background-color: #e74c3c;
+    margin-top: 20px;
+}
+
+.copy button:hover {
+    background-color: #c0392b;
+}
+
+/* Password Strength Indicator */
+#strengthIndicator {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.weak {
+    color: red;
+}
+
+.medium {
+    color: orange;
+}
+
+.strong {
+    color: green;
+}
+
+/* Footer Section */
+footer {
+    width: 100%;
+    background-color: #34495e;
+    padding: 15px;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    color: white;
+}
+
+</style>
+
+<script>
+document.getElementById('generate-btn').addEventListener('click', function() {
+    const username = document.getElementById('username').value.trim();
+
+    // Check if username is empty
+    if (username === '') {
+        alert('Please enter your name');
+        return;
+    }
+
+    // Get selected options
+    const useSymbols = document.getElementById('useSymbols').checked;
+    const useNumbers = document.getElementById('useNumbers').checked;
+    const useLowercase = document.getElementById('useLowercase').checked;
+    const useUppercase = document.getElementById('useUppercase').checked;
+
+    // Generate password
+    const generatedPassword = generatePassword(username, useSymbols, useNumbers, useLowercase, useUppercase);
+    
+    // Check the strength of the generated password
+    const passwordStrength = checkPasswordStrength(generatedPassword);
+
+    // Display password and strength
+    document.getElementById('generated-password').value = generatedPassword;
+    document.getElementById('strengthIndicator').textContent = passwordStrength;
+
+    // Show the copy button
+    document.getElementById('copy-btn').style.display = 'inline-block';
+});
+
+// Function to generate password
+function generatePassword(username, useSymbols, useNumbers, useLowercase, useUppercase) {
+    const specialChars = '!@#$%^&*()-_=+[]{}|;:,.<>?';
+    const numbers = '0123456789';
+    const lowercaseLetters = 'abcdefghijklmnopqrstuvwxyz';
+    const uppercaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    
+    let password = '@' + username; // Start with "@" followed by the username
+
+    if (useNumbers) {
+        password += numbers[Math.floor(Math.random() * numbers.length)];
+    }
+    
+    if (useSymbols) {
+        password += specialChars[Math.floor(Math.random() * specialChars.length)];
+    }
+
+    if (useLowercase) {
+        password += lowercaseLetters[Math.floor(Math.random() * lowercaseLetters.length)];
+    }
+
+    if (useUppercase) {
+        password += uppercaseLetters[Math.floor(Math.random() * uppercaseLetters.length)];
+    }
+
+    // Ensure password is at least 12 characters long
+    while (password.length < 12) {
+        const allChars = (useSymbols ? specialChars : '') +
+                         (useNumbers ? numbers : '') +
+                         (useLowercase ? lowercaseLetters : '') +
+                         (useUppercase ? uppercaseLetters : '');
+        password += allChars[Math.floor(Math.random() * allChars.length)];
+    }
+
+    return password;
+}
+
+// Function to check password strength
+function checkPasswordStrength(password) {
+    const strongPasswordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]:;"'<>,.?/]).{8,}$/;
+
+    // Evaluate the strength
+    if (strongPasswordPattern.test(password)) {
+        return 'Your password is strong.';
+    } else {
+        return 'Your password is weak.';
+    }
+}
+
+// Function to copy the password to clipboard
+document.getElementById('copy-btn').addEventListener('click', function() {
+    const passwordText = document.getElementById('generated-password').value;
+
+    // Create a temporary input to copy the password
+    const tempInput = document.createElement('input');
+    tempInput.value = passwordText;
+    document.body.appendChild(tempInput);
+    
+    tempInput.select();
+    document.execCommand('copy');
+    
+    // Remove the temporary input after copying
+    document.body.removeChild(tempInput);
+
+    alert('Password copied to clipboard!');
+});
+(function () {
+  "use strict";
+
+  // Prevent XSS Attacks by sanitizing user inputs
+  function sanitizeInput(input) {
+    const tempDiv = document.createElement("div");
+    tempDiv.textContent = input;
+    return tempDiv.innerHTML;
+  }
+
+  // Example: Sanitize all input fields automatically
+  const inputs = document.querySelectorAll("input, textarea");
+  inputs.forEach(input => {
+    input.addEventListener("input", (e) => {
+      e.target.value = sanitizeInput(e.target.value);
+    });
+  });
+
+  // Disable right-click to prevent unauthorized access
+  document.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    console.warn("Right-click is disabled to enhance security.");
+  });
+
+  // Prevent debugging tools (like F12/DevTools)
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
+      e.preventDefault();
+      console.warn("Developer tools are disabled.");
+    }
+  });
+
+  // Monitor DOM changes for suspicious activity
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.addedNodes.length > 0) {
+        mutation.addedNodes.forEach(node => {
+          if (node.nodeType === 1 && node.tagName === "SCRIPT") {
+            console.error("Unauthorized script detected and removed!");
+            node.remove();
+          }
+        });
+      }
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Secure cookies
+  document.cookie = "SecureCookie=SecureValue; Secure; HttpOnly; SameSite=Strict";
+
+  console.log("Basic security measures are active on this website.");
+})();
+
+</script>
